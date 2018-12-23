@@ -140,7 +140,7 @@ export default {
       rulesState: {},
       tokenId: 'SEED',
       confirmationHash: '',
-      triggerContractAddress: '',
+      triggerContractAddress: 'TEEXEWrkMFKapSMJ6mErg39ELFKDqEs6w3',
       notificationCount: 0,
       session_id: `${Math.random()}`
     }

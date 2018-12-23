@@ -1,6 +1,6 @@
 <template>
   <div id="app" >
-<div class="ui container">
+<div class="ui segment container">
 <h1 class="ui dividing header"><small>TRONHOOK DEMO</small></h1>
 <div class="info">
 <p>Here are some demo of usecases that TronHook can help with. <em><b>It is not only limited to these usecase</b></em>, you can write any rule you want that match your requirements.</p>
@@ -10,23 +10,45 @@
 <p>Note that this demo checks the matching rules only for the latest blocks, but you can also get notifications for previous blocks or a specific range of blocks.</p>
 </div>
 
-<div class="ui warning message">
+<div class="ui info message">
   Rules are deleted every half hour (no matter when you created them) on this demo server, if you are not receiving notifications anymore it might be for this reason.<br>
  In that case, please reload the page and add your rules again
 </div>
-
-<div class="ui grid">
-
-  <div class="column">
-      <div class="ui large blue label right floated">
-        <i class="alarm icon"></i>
-        Received notifications
-      <div class="detail">{{notificationCount}}</div>
-      </div>
+    <div class="ui vertical stripe segment" style="background: #f5f5f5;opacity: 0.7;">
+        <div class="ui stackable four column centered grid container">
+        <div class="ui center aligned column">
+          <div class="ui small orange statistic">
+            <div class="value">
+              <small>{{notificationCount}}</small>
+            </div>
+            <div class="label">
+              Notifications
+            </div>
+          </div>
+        </div>
+        <div class="ui center aligned column">
+          <div class="ui small green statistic">
+            <div class="value">
+              <small>{{stats.rulesCount}}</small>
+            </div>
+            <div class="label">
+              Rules
+            </div>
+          </div>
+        </div>
+        <div class="ui center aligned column">
+          <div class="ui small grey statistic">
+            <div class="value">
+              <small>{{stats.lastProcessedBlock}}</small>
+            </div>
+            <div class="label">
+              Last processed block
+            </div>
+          </div>
+        </div>
   </div>
-
-</div>
-
+  </div>
+  <br>
 <div class="ui grid">
   <div class="four wide column">
     <b>RULE EXAMPLES</b>
@@ -78,7 +100,7 @@
       </div>
       <!--TRACK TRIGGERS-->
       <div class="ui tab" data-tab="triggers">
-          <p><i class="ui circle info icon"></i>Receive a notification every time a triggers occurs on a specific contract</p>
+          <p><i class="ui circle info icon"></i>Receive a notification every time a specific contract is triggered</p>
         <div class="ui form">
           <div class="field">
             <label>Contract address</label>
@@ -96,7 +118,7 @@
   </div>
 </div>
 </div>
-<div class="ui container">
+<div class="ui segment container">
   <h2  class="ui dividing header"><a id="notifications"></a><small>Received notifications</small></h2>
   <table id="table_id" class="ui fixed selectable orange table" width="100%">
       <thead>
@@ -142,6 +164,10 @@ export default {
       confirmationHash: '',
       triggerContractAddress: 'TEEXEWrkMFKapSMJ6mErg39ELFKDqEs6w3',
       notificationCount: 0,
+      stats: {
+        rulesCount: 0,
+        lastProcessedBlock: 0
+      },
       session_id: `${Math.random()}`
     }
   },
@@ -158,7 +184,7 @@ export default {
           'id': 'confirm_transaction',
           'context': 'transaction',
           'rule': `confirmed==true and hash=='${this.confirmationHash}'`,
-          'repeat': 'always'
+          'repeat': 'once'
         },
         'track_triggers': {
           'id': 'track_trigger',
@@ -184,6 +210,21 @@ export default {
         }))
       }
     },
+    fetchStats () {
+      const statsPromise = axios.get(`${Conf.api}/stats`)
+      const rulesPromise = axios.get(`${Conf.api}/rules`)
+      Promise.all([statsPromise, rulesPromise]).then((results) => {
+        this.stats.lastProcessedBlock = results[0].data.lastProcessedBlock
+        this.stats.rulesCount = 0
+        let rules = results[1].data
+        for (let i = 0; i < rules.length; i++) {
+          const rule = rules[i]
+          if (rule.id.indexOf(this.session_id) !== -1) {
+            this.stats.rulesCount++
+          }
+        }
+      })
+    },
     addRule (id) {
       const rules = this.rules
       let rule = {...rules[id], id: id + ':' + this.session_id}
@@ -194,6 +235,7 @@ export default {
           timeout: 1000
         }).show()
         this.checkRules()
+        this.fetchStats()
       })
     },
     removeRule (id) {
@@ -227,6 +269,9 @@ export default {
     setInterval(() => {
       this.checkRules()
     }, 5000)
+    setInterval(() => {
+      this.fetchStats()
+    }, 1000)
     // handle ws message
     ws.onmessage = (data) => {
       let message = JSON.parse(data.data)
@@ -258,6 +303,9 @@ export default {
 </script>
 
 <style>
+body{
+  background-color: #f7f7f8;
+}
 .info p{
   font-size: 16px;
 }

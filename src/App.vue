@@ -129,7 +129,7 @@ import Conf from './config'
 
 Vue.use(VueTable)
 Noty.setMaxVisible(10)
-var ws = new WebSocket('ws://localhost:7272')
+var ws = new WebSocket(Conf.ws)
 export default {
   name: 'App',
   components: {

@@ -1,5 +1,5 @@
 <template>
-  <div id="app" >
+  <div id="app" style="background-color: #f7f7f8;">
 <div class="ui container">
     <div class="ui grid">
       <div class="column right aligned">
@@ -330,9 +330,6 @@ export default {
 </script>
 
 <style>
-body{
-  background-color: #f7f7f8;
-}
 .info p{
   font-size: 16px;
 }

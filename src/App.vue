@@ -15,7 +15,7 @@
 <p>This demo is focusing on the notification feature but TronHook is not just a notification tool, other features are also available (data sync into db, data processing ...), it aims to simplify data integration between Tron and your (d)App.</p>
 <p>If you want to have more details about how to write rules, you can check the documentation.</p>
 <p>To start receiving notifications, choose one or multiple rules and save them. TronHook node will start sending notifications via websocket to this page !</p>
-<p>Note that this demo checks the matching rules only for the latest blocks, but you can also get notifications for previous blocks or a specific range of blocks.</p>
+<p><i class="ui circle info icon"></i> Note that this demo checks the matching rules only for the latest blocks of Mainnet, but you can also get notifications for previous blocks or a specific range of blocks, or replay the entire blockchain.</p>
 </div>
 
 <div class="ui info message">

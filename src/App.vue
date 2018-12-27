@@ -1,17 +1,25 @@
 <template>
   <div id="app" >
+<div class="ui container">
+    <div class="ui grid">
+      <div class="column right aligned">
+        <a href="https://github.com/tronhook/tronhook" target="_blank" style="margin-right:10px;"><i class="ui large github icon"></i>Github</a>
+        <a href="https://tronhook.github.io/docs" target="_blank"><i class="ui large book icon"></i>Documentation </a>
+      </div>
+    </div>
+</div>
 <div class="ui segment container">
 <h1 class="ui dividing header"><small>TRONHOOK DEMO</small></h1>
 <div class="info">
 <p>Here are some demo of usecases that TronHook can help with. <em><b>It is not only limited to these usecase</b></em>, you can write any rule you want that match your requirements.</p>
-<p>This demo is focusing on the notification feature but TronHook is not just a notification tool, you can do much more with it !</p>
-<p>If you want to have more details about how to write rules, you can check the documentation here.</p>
+<p>This demo is focusing on the notification feature but TronHook is not just a notification tool, other features are also available (data sync into db, data processing ...), it aims to simplify data integration between Tron and your (d)App.</p>
+<p>If you want to have more details about how to write rules, you can check the documentation.</p>
 <p>To start receiving notifications, choose one or multiple rules and save them. TronHook node will start sending notifications via websocket to this page !</p>
 <p>Note that this demo checks the matching rules only for the latest blocks, but you can also get notifications for previous blocks or a specific range of blocks.</p>
 </div>
 
 <div class="ui info message">
-  Rules are deleted every half hour (no matter when you created them) on this demo server, if you are not receiving notifications anymore it might be for this reason.<br>
+  Rules are deleted every 30min (no matter when you created them) on this demo server, if all rules suddenly disapear and your are not receiving notifications anymore it might be for this reason.
  In that case, please reload the page and add your rules again
 </div>
     <div class="ui vertical stripe segment" style="background: #f5f5f5;opacity: 0.7;">

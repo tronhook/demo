@@ -128,17 +128,24 @@
 </div>
 <div class="ui segment container">
   <h2  class="ui dividing header"><a id="notifications"></a><small>Received notifications</small></h2>
+  <p><i class="ui circle info icon"></i> Click a a row to get the message detail</p>
   <table id="table_id" class="ui fixed selectable orange table" width="100%">
       <thead>
           <tr>
               <th class="two wide">#</th>
               <th class="two wide">Rule Id</th>
-              <th class="ten wide">Result</th>
+              <th class="ten wide">Message</th>
           </tr>
       </thead>
       <tbody>
       </tbody>
   </table>
+</div>
+<div class="ui modal">
+  <div class="header">Message detail</div>
+  <div class="scrolling content">
+    <vue-json-pretty :data="notificationDetail"></vue-json-pretty>
+  </div>
 </div>
   </div>
 </template>
@@ -148,6 +155,9 @@ import Noty from 'noty'
 import $ from 'jquery'
 import 'semantic-ui/dist/semantic.css'
 import 'semantic-ui/dist/components/tab'
+import 'semantic-ui/dist/components/modal'
+import 'semantic-ui/dist/components/transition'
+import 'semantic-ui/dist/components/dimmer'
 import 'noty/lib/noty.css'
 import VueJsonPretty from 'vue-json-pretty'
 import axios from 'axios'
@@ -168,6 +178,8 @@ export default {
   data () {
     return {
       rulesState: {},
+      notificationDetail: {},
+      notifications: [],
       tokenId: 'SEED',
       confirmationHash: '',
       triggerContractAddress: 'TEEXEWrkMFKapSMJ6mErg39ELFKDqEs6w3',
@@ -204,6 +216,11 @@ export default {
     }
   },
   methods: {
+    showMessageDetail (data) {
+      let num = data[0]
+      this.notificationDetail = this.notifications[num]
+      $('.modal').modal('show')
+    },
     checkRules () {
       // check if rules exists every 5s
       const rules = Object.keys(this.rules)
@@ -270,8 +287,9 @@ export default {
     let t = $('#table_id').DataTable({
       'order': [[ 0, 'desc' ]]
     })
+    const showMessage = this.showMessageDetail
     t.on('click', 'tr', function () {
-      console.log(t.row(this).data())
+      showMessage(t.row(this).data())
     })
     // check rule status every 5s
     setInterval(() => {
@@ -293,8 +311,9 @@ export default {
         const ruleNamePart = ruleParts[0]
         const ruleSessionPart = ruleParts[1]
         if (ruleSessionPart === this.session_id) {
+          this.notifications.push(message)
           const rule = message[ruleId]
-          t.row.add([this.notificationCount, ruleNamePart, JSON.stringify(rule)]).draw(false)
+          t.row.add([this.notificationCount, ruleNamePart, JSON.stringify(rule).substring(0, 150) + '...']).draw(false)
           this.notificationCount++
         }
       }

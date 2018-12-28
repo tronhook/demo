@@ -73,6 +73,9 @@
       <a class="item " data-tab="votes">
         Track votes for specific address
       </a>
+      <a class="item " data-tab="custom_rule">
+        Custom rule
+      </a>
     </div>
   </div>
   <div class="twelve wide stretched column">
@@ -141,6 +144,24 @@
           <button class="ui red button right floated" type="submit" @click="removeRule('track_votes')" v-show="this.rulesState.track_votes.exists">Remove rule</button>
         </div>
       </div>
+      <!--CUSTOM RULE-->
+      <div class="ui tab" data-tab="custom_rule">
+          <p><i class="ui circle info icon"></i>Write and test your own rule</p>
+        <div class="ui form">
+          <div class="field">
+            <label>Rule</label>
+            <input type="text" v-model="customRule">
+          </div>
+          <div class="field">
+            <label>Rule specification</label>
+            <p>This rule will be executed only once to prevent any abuse on this demo server</p>
+            <vue-json-pretty :path="'res'" :data="rules.custom_rule"></vue-json-pretty>
+            <p style="color:red;" v-show="customRuleError!=null">Error: {{customRuleError}}</p>
+          </div>
+          <button class="ui green button right floated" type="submit" @click="addRule('custom_rule')" :class="{'disabled':this.rulesState.custom_rule.exists}">Add rule</button>
+          <button class="ui red button right floated" type="submit" @click="removeRule('custom_rule')" v-show="this.rulesState.custom_rule.exists">Remove rule</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -171,6 +192,7 @@
 
 <script>
 import Noty from 'noty'
+import 'noty/lib/themes/mint.css'
 import $ from 'jquery'
 import 'semantic-ui/dist/semantic.css'
 import 'semantic-ui/dist/components/tab'
@@ -199,9 +221,11 @@ export default {
       rulesState: {},
       notificationDetail: {},
       notifications: [],
+      customRuleError: null,
       voteToAddress: 'TGzz8gjYiYRqpfmDwnLxfgPuLVNmpCswVp',
       tokenId: 'SEED',
       confirmationHash: '',
+      customRule: '',
       triggerContractAddress: 'TEEXEWrkMFKapSMJ6mErg39ELFKDqEs6w3',
       notificationCount: 0,
       stats: {
@@ -237,6 +261,12 @@ export default {
           'context': 'transaction',
           'rule': `type==4 and contract.hasVoteTo('${this.voteToAddress}')`,
           'repeat': 'always'
+        },
+        'custom_rule': {
+          'id': 'custom_rule',
+          'context': 'transaction',
+          'rule': `${this.customRule}`,
+          'repeat': 'once'
         }
       }
     }
@@ -261,6 +291,15 @@ export default {
         }))
       }
     },
+    checkCustomRuleError () {
+      this.getRule('custom_rule').then((res) => {
+        if (res.data && res.data.error) {
+          this.customRuleError = res.data.error
+        } else {
+          this.customRuleError = null
+        }
+      })
+    },
     fetchStats () {
       const statsPromise = axios.get(`${Conf.api}/stats`)
       const rulesPromise = axios.get(`${Conf.api}/rules`)
@@ -281,6 +320,7 @@ export default {
       let rule = {...rules[id], id: id + ':' + this.session_id}
       axios.post(`${Conf.api}/rule`, rule).then((data) => {
         new Noty({
+          theme: 'mint',
           type: 'success',
           text: 'Rule successfully added !',
           timeout: 1000
@@ -323,6 +363,7 @@ export default {
     }, 5000)
     setInterval(() => {
       this.fetchStats()
+      this.checkCustomRuleError()
     }, 1000)
     // handle ws message
     ws.onmessage = (data) => {

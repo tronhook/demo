@@ -3,8 +3,8 @@
 <div class="ui container">
     <div class="ui grid">
       <div class="column right aligned">
-        <a href="https://github.com/tronhook/tronhook" target="_blank" style="margin-right:10px;"><i class="ui large github icon"></i>Github</a>
-        <a href="https://tronhook.github.io/docs" target="_blank"><i class="ui large book icon"></i>Documentation </a>
+        <a href="https://github.com/tronhook/tronhook" rel="noreferrer noopener" target="_blank" style="margin-right:10px;"><i class="ui large github icon"></i>Github</a>
+        <a href="https://tronhook.github.io/docs" rel="noreferrer noopener" target="_blank"><i class="ui large book icon"></i>Documentation </a>
       </div>
     </div>
 </div>
@@ -70,6 +70,9 @@
       <a class="item " data-tab="triggers">
         Track triggers of a specific contract
       </a>
+      <a class="item " data-tab="votes">
+        Track votes for specific address
+      </a>
     </div>
   </div>
   <div class="twelve wide stretched column">
@@ -120,6 +123,22 @@
           </div>
           <button class="ui green button right floated" type="submit" @click="addRule('track_triggers')" :class="{'disabled':this.rulesState.track_triggers.exists}">Add rule</button>
           <button class="ui red button right floated" type="submit" @click="removeRule('track_triggers')" v-show="this.rulesState.track_triggers.exists">Remove rule</button>
+        </div>
+      </div>
+      <!--TRACK Votes-->
+      <div class="ui tab" data-tab="votes">
+          <p><i class="ui circle info icon"></i>Receive a notification on votes for a specific address</p>
+        <div class="ui form">
+          <div class="field">
+            <label>Vote address</label>
+            <input type="text" v-model="voteToAddress">
+          </div>
+          <div class="field">
+            <label>Rule specification</label>
+            <vue-json-pretty :path="'res'" :data="rules.track_votes"></vue-json-pretty>
+          </div>
+          <button class="ui green button right floated" type="submit" @click="addRule('track_votes')" :class="{'disabled':this.rulesState.track_votes.exists}">Add rule</button>
+          <button class="ui red button right floated" type="submit" @click="removeRule('track_votes')" v-show="this.rulesState.track_votes.exists">Remove rule</button>
         </div>
       </div>
     </div>
@@ -180,6 +199,7 @@ export default {
       rulesState: {},
       notificationDetail: {},
       notifications: [],
+      voteToAddress: 'TGzz8gjYiYRqpfmDwnLxfgPuLVNmpCswVp',
       tokenId: 'SEED',
       confirmationHash: '',
       triggerContractAddress: 'TEEXEWrkMFKapSMJ6mErg39ELFKDqEs6w3',
@@ -210,6 +230,12 @@ export default {
           'id': 'track_trigger',
           'context': 'transaction',
           'rule': `type==31 and contract.contractAddress=='${this.triggerContractAddress}'`,
+          'repeat': 'always'
+        },
+        'track_votes': {
+          'id': 'track_votes',
+          'context': 'transaction',
+          'rule': `type==4 and contract.hasVoteTo('${this.voteToAddress}')`,
           'repeat': 'always'
         }
       }

@@ -1,8 +1,8 @@
 /* eslint-disable */
 const conf = {
     "production": {
-        api:"https://tronhook.trxplorer.io",
-        ws:"wss://wss.trxplorer.io"
+        api:"https://demo.tronhook.org",
+        ws:"wss://wss.tronhook.org"
     },
     "development": {
         api:"http://localhost:7171",
